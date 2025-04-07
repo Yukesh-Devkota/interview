@@ -6,24 +6,24 @@ require('dotenv').config();
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from frontend/
-const staticPath = path.join(__dirname, 'frontend');
-console.log('Serving static files from:', staticPath);
-app.use(express.static(staticPath));
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../frontend'))); // Adjust if needed
 
-// API endpoint
+// API endpoint to proxy OpenRouter requests
 app.post('/api/getAnswer', async (req, res) => {
   const { question, conversationHistory } = req.body;
+
   try {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.APP_URL || 'http://localhost:3000',
+        'HTTP-Referer': process.env.APP_URL || 'http://localhost:3000', // Use env var for Render
         'X-Title': 'Instant Interview Assistant'
       },
       body: JSON.stringify({
@@ -33,10 +33,12 @@ app.post('/api/getAnswer', async (req, res) => {
         temperature: 0.7
       })
     });
+
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`API request failed: ${response.status} - ${errorText}`);
     }
+
     const data = await response.json();
     const answer = data.choices[0]?.message?.content || 'No answer.';
     res.json({ answer });
@@ -46,12 +48,9 @@ app.post('/api/getAnswer', async (req, res) => {
   }
 });
 
-// Serve index.html (or live-interview.html) for non-static routes
+// Serve live-interview.html for all other routes
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/css') || req.path.startsWith('/js')) {
-    return res.status(404).send('File not found');
-  }
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html')); // Changed to index.html
+  res.sendFile(path.join(__dirname, '../frontend', 'live-interview.html')); // Match your main HTML
 });
 
 module.exports = app;
