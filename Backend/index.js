@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname, '../frontend'))); // Adjust if needed
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // API endpoint to proxy OpenRouter requests
 app.post('/api/getAnswer', async (req, res) => {
@@ -23,7 +23,7 @@ app.post('/api/getAnswer', async (req, res) => {
       headers: {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.APP_URL || 'https://interview-assistant-njbb.onrender.com/', // Use env var for Render
+        'HTTP-Referer': process.env.https://interview-assistant-njbb.onrender.com/ || 'http://localhost:3000',
         'X-Title': 'Instant Interview Assistant'
       },
       body: JSON.stringify({
@@ -48,9 +48,12 @@ app.post('/api/getAnswer', async (req, res) => {
   }
 });
 
-// Serve live-interview.html for all other routes
+// Serve live-interview.html for non-static routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend', 'live-interview.html')); // Match your main HTML
+  if (req.path.startsWith('/css') || req.path.startsWith('/js')) {
+    return res.status(404).send('File not found');
+  }
+  res.sendFile(path.join(__dirname, '../frontend', 'live-interview.html'));
 });
 
 module.exports = app;
