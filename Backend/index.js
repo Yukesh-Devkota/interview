@@ -23,7 +23,7 @@ app.post('/api/getAnswer', async (req, res) => {
       headers: {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.https://interview-assistant-njbb.onrender.com/ || 'http://localhost:3000',
+        'HTTP-Referer': process.env.APP_URL || 'http://localhost:3000', // Fixed line
         'X-Title': 'Instant Interview Assistant'
       },
       body: JSON.stringify({
