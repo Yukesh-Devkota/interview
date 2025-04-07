@@ -11,7 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static frontend files
-app.use(express.static(path.join(__dirname, '../frontend')));
+const staticPath = path.join(__dirname, 'frontend');
+console.log('Serving static files from:', staticPath);
+app.use(express.static(staticPath));
 
 // API endpoint to proxy OpenRouter requests
 app.post('/api/getAnswer', async (req, res) => {
@@ -23,7 +25,7 @@ app.post('/api/getAnswer', async (req, res) => {
       headers: {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.APP_URL || 'http://localhost:3000', // Fixed line
+        'HTTP-Referer': process.env.APP_URL || 'http://localhost:3000',
         'X-Title': 'Instant Interview Assistant'
       },
       body: JSON.stringify({
@@ -53,7 +55,7 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/css') || req.path.startsWith('/js')) {
     return res.status(404).send('File not found');
   }
-  res.sendFile(path.join(__dirname, '../frontend', 'live-interview.html'));
+  res.sendFile(path.join(__dirname, 'frontend', 'live-interview.html'));
 });
 
 module.exports = app;
