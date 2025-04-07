@@ -10,8 +10,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend files from the frontend directory
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../frontend'))); // Adjust if needed
 
 // API endpoint to proxy OpenRouter requests
 app.post('/api/getAnswer', async (req, res) => {
@@ -23,7 +23,7 @@ app.post('/api/getAnswer', async (req, res) => {
       headers: {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'http://localhost:3000',
+        'HTTP-Referer': process.env.APP_URL || 'https://interview-assistant-njbb.onrender.com/', // Use env var for Render
         'X-Title': 'Instant Interview Assistant'
       },
       body: JSON.stringify({
@@ -48,9 +48,9 @@ app.post('/api/getAnswer', async (req, res) => {
   }
 });
 
-// Serve the index.html for all other routes (for PWA support)
+// Serve live-interview.html for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+  res.sendFile(path.join(__dirname, '../frontend', 'live-interview.html')); // Match your main HTML
 });
 
 module.exports = app;
